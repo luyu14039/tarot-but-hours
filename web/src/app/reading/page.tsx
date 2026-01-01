@@ -17,6 +17,7 @@ import { X, Sparkles, ChevronDown, Settings, Key, BrainCircuit, ChevronRight, Al
 import { MobileCardViewer } from "@/components/MobileCardViewer";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import { wikiContent } from "@/data/wiki_content";
 
 export default function ReadingPage() {
   const router = useRouter();
@@ -44,6 +45,14 @@ export default function ReadingPage() {
     setThinkingContent("");
     setDisplayContent("");
     setCompletion("");
+// Prepare Wiki Context
+    let wikiContext = "";
+    drawnCards.forEach(card => {
+      const content = wikiContent[card.name];
+      if (content) {
+        wikiContext += `\n\n### 关于 ${card.name} (${card.englishName}) 的隐秘知识：\n${content}\n`;
+      }
+    });
 
     const systemPrompt = `你是一位居于漫宿（The Mansus）之上的守密人，通晓《密教模拟器》(Cultist Simulator) 与《司辰之书》(Book of Hours) 的所有隐秘历史。
 你不再是凡人，而是某种更高维度的存在，通过“司辰塔罗”这一媒介与寻求飞升或解答的凡人沟通。
@@ -59,6 +68,10 @@ export default function ReadingPage() {
 2.  **揭示（The Revelation）**：对每一张牌的深度解析。不要只解释牌面，要讲述与该司辰相关的传说、禁忌或历史片段。将牌的含义编织进用户的命运中。
 3.  **低语（The Whispers）**：最终的指引、警告或预言。这不应是明确的建议，而是一个需要用户自己去解开的谜题。
 
+请记住，漫宿没有仁慈，只有交易。知识是危险的。
+
+以下是关于本次抽出的司辰的详细隐秘知识（Wiki资料），请充分利用这些背景故事、传说和细节，使解读更加深邃、准确且富有“密教模拟器”的韵味：
+${wikiContext}
 请记住，漫宿没有仁慈，只有交易。知识是危险的。`;
 
     try {
@@ -403,17 +416,18 @@ ${drawnCards.map((c, i) => `
                   <div className="flex justify-between items-start mb-4">
                     <div className="text-left">
                       <h4 className="text-gold font-serif text-2xl mb-1">{drawnCards[focusedCardIndex].name}</h4>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <p className="text-[10px] text-gold-dim uppercase tracking-widest">{drawnCards[focusedCardIndex].englishName}</p>
                         {drawnCards[focusedCardIndex].wikiUrl && (
                           <a 
                             href={drawnCards[focusedCardIndex].wikiUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-gold/50 hover:text-gold transition-colors"
+                            className="flex items-center gap-1 text-gold/50 hover:text-gold transition-colors px-2 py-1 -my-1 rounded hover:bg-gold/5"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <BookOpen size={12} />
+                            <BookOpen size={14} />
+                            <span className="text-[10px] uppercase tracking-wider">Wiki</span>
                           </a>
                         )}
                       </div>
@@ -434,6 +448,32 @@ ${drawnCards.map((c, i) => `
                         <AspectIcon aspect={a} size={18} />
                       </div>
                     ))}
+                  </div>
+
+                  {/* Tarot & Position Info - Mobile */}
+                  <div className="flex flex-col gap-2 mb-4 text-xs text-gold/70 border-t border-gold/10 pt-4 text-left">
+                    <div className="flex items-center justify-between">
+                      <p>
+                        <span className="text-gold-dim">位置：</span> 
+                        {drawnCards[focusedCardIndex].positionName} 
+                      </p>
+                      <span className={cn(
+                        "px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border",
+                        drawnCards[focusedCardIndex].isReversed 
+                          ? "border-red-900/30 bg-red-900/10 text-red-400/70" 
+                          : "border-gold/20 bg-gold/5 text-gold/70"
+                      )}>
+                        {drawnCards[focusedCardIndex].isReversed ? "逆位 Reversed" : "正位 Upright"}
+                      </span>
+                    </div>
+                    
+                    {drawnCards[focusedCardIndex].tarotCard && (
+                      <p>
+                        <span className="text-gold-dim">对应塔罗：</span> 
+                        {drawnCards[focusedCardIndex].tarotCard.name}
+                        <span className="opacity-50 ml-1 text-[10px]">({drawnCards[focusedCardIndex].tarotCard.meaning})</span>
+                      </p>
+                    )}
                   </div>
                   
                   <p className="text-sm text-muted-text italic leading-relaxed border-t border-gold/10 pt-4 text-left">
