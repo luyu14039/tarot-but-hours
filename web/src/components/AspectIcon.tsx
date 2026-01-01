@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, prefixPath } from '@/lib/utils';
 
 interface AspectIconProps {
   aspect: string;
@@ -39,7 +39,7 @@ export function AspectIcon({ aspect, className, size = 24 }: AspectIconProps) {
       title={aspect}
     >
       <Image
-        src={`/icons/${filename}`}
+        src={prefixPath(`/icons/${filename}`)}
         alt={aspect}
         fill
         className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"

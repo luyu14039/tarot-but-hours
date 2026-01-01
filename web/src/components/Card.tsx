@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { HourCard } from "@/data/hours";
-import { cn } from "@/lib/utils";
+import { cn, prefixPath } from "@/lib/utils";
 
 interface CardProps {
   card: HourCard;
@@ -62,7 +62,7 @@ export function Card({
         >
           <div className="relative w-full h-full">
             <Image
-              src={card.imagePath}
+              src={prefixPath(card.imagePath)}
               alt={card.name}
               fill
               className="object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500 sepia-[0.3] contrast-110"
