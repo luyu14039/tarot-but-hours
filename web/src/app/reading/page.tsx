@@ -20,7 +20,7 @@ import rehypeRaw from "rehype-raw";
 
 export default function ReadingPage() {
   const router = useRouter();
-  const { question, selectedSpread, drawnCards, reset, apiKey } = useStore();
+  const { question, selectedSpread, drawnCards, reset, apiKey, setApiKey } = useStore();
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
   const [readingStarted, setReadingStarted] = useState(false);
