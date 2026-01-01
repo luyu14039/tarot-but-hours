@@ -22,6 +22,7 @@ const aspectMap: Record<string, string> = {
   secrethistories: 'Secrethistories.png',
   sky: 'sky.png',
   winter: 'Winter.webp',
+  wound: 'edge.png', // Fallback for wound
 };
 
 export function AspectIcon({ aspect, className, size = 24 }: AspectIconProps) {
