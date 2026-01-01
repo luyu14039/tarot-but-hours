@@ -29,7 +29,7 @@ body {
   color: var(--color-primary-text);
   font-family: var(--font-cormorant), var(--font-noto-serif-sc), serif;
   overflow-x: hidden;
-  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  /* background-image: url("https://grainy-gradients.vercel.app/noise.svg"); */
   background-blend-mode: overlay;
   background-attachment: fixed;
 }
