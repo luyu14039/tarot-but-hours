@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-cormorant), var(--font-noto-serif-sc), serif;
+  --font-gothic: var(--font-unifraktur), cursive;
+  --font-sans: var(--font-inter), sans-serif;
+
+  --color-void: #111010;
+  --color-void-deep: #0a0a0a;
+  --color-gold: #c5a059;
+  --color-gold-dim: #8c734b;
+  --color-gold-light: #e5c07b;
+  --color-grail: #a83232;
+  --color-moth: #e6e6fa;
+  --color-winter: #cfd8dc;
+  --color-primary-text: #dcdcdc;
+  --color-muted-text: #888888;
+  
+  --animate-fade-in: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-primary-text);
+  font-family: var(--font-cormorant), var(--font-noto-serif-sc), serif;
+  overflow-x: hidden;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  background-blend-mode: overlay;
+  background-attachment: fixed;
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void); 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333; 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold); 
+}
+
+/* 3D Transform Utilities */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
