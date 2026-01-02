@@ -23,7 +23,7 @@ const spreads: { id: SpreadType; name: string; desc: string; icon: any }[] = [
   { 
     id: "three", 
     name: "漫宿的浩旅", 
-    desc: "过去（雄鹿之门） / 现在（蜘蛛之门） / 未来（孔雀之门）。",
+    desc: "过去（牡鹿之门） / 现在（蜘蛛之门） / 未来（孔雀之门）。",
     icon: Layers
   },
   { 

@@ -27,7 +27,27 @@ try {
                 name = nameMapping[name];
             }
             
-            const content = fs.readFileSync(path.join(hoursDesPath, file), 'utf-8');
+            let content = fs.readFileSync(path.join(hoursDesPath, file), 'utf-8');
+
+            // --- Content Cleaning ---
+            
+            // 1. Remove the metadata table at the top (lines starting with |)
+            content = content.replace(/^\|.*$/gm, '');
+
+            // 2. Remove specific sections we don't need for the LLM context
+            // Sections to remove: "现实原型", "杂项", "司辰画廊"
+            // We use a regex that matches "## SectionName" and everything until the next "## " or end of string
+            const sectionsToRemove = ['现实原型', '杂项', '司辰画廊'];
+            sectionsToRemove.forEach(section => {
+                const regex = new RegExp(`## ${section}[\\s\\S]*?(?=## |$)`, 'g');
+                content = content.replace(regex, '');
+            });
+
+            // 3. Clean up multiple newlines created by removals
+            content = content.replace(/\n{3,}/g, '\n\n').trim();
+
+            // ------------------------
+
             wikiData[name] = content;
         }
     });

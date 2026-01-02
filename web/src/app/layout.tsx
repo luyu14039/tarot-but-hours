@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { UnifrakturMaguntia, Cormorant_Garamond, Noto_Serif_SC, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -41,6 +42,10 @@ export default function RootLayout({
         className={`${unifraktur.variable} ${cormorant.variable} ${notoserifsc.variable} ${inter.variable} antialiased bg-void text-primary-text font-serif`}
       >
         {children}
+        <Script 
+          src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" 
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

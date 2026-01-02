@@ -8,8 +8,9 @@ import { Particles } from "@/components/Particles";
 import { Frame } from "@/components/ui/Frame";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { Sparkles, Eye, Layers, LayoutGrid, ArrowRight, Settings, X, Github, ExternalLink, Monitor, ChevronDown } from "lucide-react";
+import { Sparkles, Eye, Layers, LayoutGrid, ArrowRight, Settings, X, Github, ExternalLink, Monitor, ChevronDown, History, Clock, Star, Dices, Users } from "lucide-react";
 import { FontDebug } from "@/components/FontDebug";
+import { AspectIcon } from "@/components/AspectIcon";
 
 const quotes = [
   "飞蛾总是飞向光，但光总是烧死飞蛾。",
@@ -19,6 +20,24 @@ const quotes = [
   "不要接受制花人的礼物。",
   "只有在绝对的黑暗中，颜色才拥有触感。",
   "结局总是美丽的，只要你接受它的到来。",
+];
+
+const randomQuestions = [
+  "我该如何面对当前的困境？",
+  "这段关系会有结果吗？",
+  "我的未来如何？",
+  "我应该做出什么改变？",
+  "我忽略了什么重要的信息？",
+  "我该如何提升自己？",
+  "我该如何处理这段感情？",
+  "我该如何解决这个问题？",
+  "我该如何面对这个挑战？",
+  "我该如何选择？",
+  "我该如何平衡生活与工作？",
+  "我该如何寻找内心的平静？",
+  "我该如何理解这个梦境？",
+  "我该如何面对失去？",
+  "我该如何重拾信心？",
 ];
 
 const titles = [
@@ -64,14 +83,40 @@ const otherProjects = [
 
 export default function Home() {
   const router = useRouter();
-  const { setQuestion, setSelectedSpread, apiKey, setApiKey } = useStore();
+  const { 
+    setQuestion, 
+    setSelectedSpread, 
+    apiKey, 
+    setApiKey, 
+    history, 
+    loadHistoryItem,
+    visitCount,
+    incrementVisitCount,
+    hasSeenPromo,
+    markPromoSeen
+  } = useStore();
   const [input, setInput] = useState("");
   const [localSpread, setLocalSpread] = useState<SpreadType>("single");
   const [quote, setQuote] = useState("");
   const [title, setTitle] = useState(titles[0]);
   const [showSettings, setShowSettings] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showPromo, setShowPromo] = useState(false);
   const [tempKey, setTempKey] = useState("");
   const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    incrementVisitCount();
+  }, []);
+
+  useEffect(() => {
+    if (visitCount >= 2 && !hasSeenPromo) {
+      const timer = setTimeout(() => {
+        setShowPromo(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [visitCount, hasSeenPromo]);
 
   useEffect(() => {
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
@@ -90,11 +135,26 @@ export default function Home() {
     setShowSettings(false);
   };
 
+  const handleClosePromo = () => {
+    markPromoSeen();
+    setShowPromo(false);
+  };
+
+  const handleRandomQuestion = () => {
+    const randomQ = randomQuestions[Math.floor(Math.random() * randomQuestions.length)];
+    setInput(randomQ);
+  };
+
   const handleStart = () => {
     if (!input.trim()) return;
     setQuestion(input);
     setSelectedSpread(localSpread);
     router.push("/spread");
+  };
+
+  const handleHistoryClick = (item: any) => {
+    loadHistoryItem(item);
+    router.push("/reading");
   };
 
   return (
@@ -117,16 +177,55 @@ export default function Home() {
           <p className="relative text-gold-dim text-lg md:text-xl tracking-[0.2em] font-gothic opacity-80 mix-blend-plus-lighter mb-6">
             {title.en}
           </p>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20 hidden"
-            onClick={() => setShowSettings(true)}
+
+          {/* Hour's Quote - Moved here */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="mb-8 text-center px-6"
           >
-            <Settings size={14} className="mr-2" />
-            <span className="tracking-widest text-xs">配置仪式密钥 (API Key)</span>
-          </Button>
+            <p className="text-gold/40 text-sm md:text-base font-serif italic tracking-wide max-w-lg mx-auto leading-relaxed">
+              “{quote}”
+            </p>
+          </motion.div>
+          
+          <div className="flex gap-4">
+            <a
+              href="https://github.com/luyu14039/tarot-but-hours"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20"
+              >
+                <Star size={14} className="mr-2" />
+                <span className="tracking-widest text-xs">Star on GitHub</span>
+              </Button>
+            </a>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20"
+              onClick={() => setShowHistory(true)}
+            >
+              <History size={14} className="mr-2" />
+              <span className="tracking-widest text-xs">历史记录</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20 hidden"
+              onClick={() => setShowSettings(true)}
+            >
+              <Settings size={14} className="mr-2" />
+              <span className="tracking-widest text-xs">配置仪式密钥 (API Key)</span>
+            </Button>
+          </div>
         </motion.div>
       </header>
 
@@ -144,17 +243,28 @@ export default function Home() {
             <label className="block text-gold/60 text-xs uppercase tracking-widest mb-4">
               在此刻下你的疑问
             </label>
-            <div className="relative group">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="..."
-                className="w-full bg-transparent border-b border-gold/30 text-center text-xl md:text-2xl py-3 text-gold placeholder-gold/10 focus:outline-none focus:border-gold transition-colors font-serif"
-                autoFocus
-                onKeyDown={(e) => e.key === "Enter" && handleStart()}
-              />
-              <div className="absolute bottom-0 left-1/2 w-0 h-[1px] bg-gold group-hover:w-full group-focus-within:w-full transition-all duration-500 -translate-x-1/2" />
+            <div className="relative group flex items-center gap-2">
+              <div className="relative flex-grow">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="..."
+                  className="w-full bg-transparent border-b border-gold/30 text-center text-xl md:text-2xl py-3 text-gold placeholder-gold/10 focus:outline-none focus:border-gold transition-colors font-serif"
+                  autoFocus
+                  onKeyDown={(e) => e.key === "Enter" && handleStart()}
+                />
+                <div className="absolute bottom-0 left-1/2 w-0 h-[1px] bg-gold group-hover:w-full group-focus-within:w-full transition-all duration-500 -translate-x-1/2" />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRandomQuestion}
+                className="text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300"
+                title="随机抽取问题"
+              >
+                <Dices size={20} />
+              </Button>
             </div>
           </div>
 
@@ -278,18 +388,159 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* 4. Hour's Quote */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="z-20 mt-8 mb-24 text-center px-6"
-      >
-        <p className="text-gold/40 text-sm md:text-base font-serif italic tracking-wide max-w-lg mx-auto leading-relaxed">
-          “{quote}”
-        </p>
-      </motion.div>
+      {/* History Modal */}
+      <AnimatePresence>
+        {showHistory && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowHistory(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+            >
+              <div className="w-full max-w-2xl px-6 pointer-events-auto h-[80vh]">
+                <Frame className="bg-void-deep border-gold/40 p-8 shadow-2xl h-full flex flex-col">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-gold font-serif text-xl">历史记录</h3>
+                    <Button variant="ghost" size="icon" onClick={() => setShowHistory(false)}>
+                      <X size={20} className="text-gold/50 hover:text-gold" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
+                    {history.length === 0 ? (
+                      <div className="text-center text-gold/30 py-10">
+                        暂无历史记录
+                      </div>
+                    ) : (
+                      history.map((item) => (
+                        <div 
+                          key={item.id}
+                          onClick={() => handleHistoryClick(item)}
+                          className="group border border-gold/10 bg-gold/5 p-4 rounded hover:bg-gold/10 hover:border-gold/30 transition-all cursor-pointer"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-gold/60 text-xs font-mono">
+                              {new Date(item.timestamp).toLocaleString()}
+                            </span>
+                            <span className="text-gold/40 text-[10px] uppercase tracking-wider border border-gold/10 px-1.5 py-0.5 rounded">
+                              {item.spread}
+                            </span>
+                          </div>
+                          <h4 className="text-gold font-serif text-lg mb-2 group-hover:text-gold-light transition-colors">
+                            {item.question}
+                          </h4>
+                          <div className="flex gap-2 overflow-x-auto pb-2 mask-linear-fade">
+                            {item.cards.map((card, idx) => (
+                              <div key={idx} className="flex-shrink-0 text-[10px] text-gold/50 bg-black/20 px-2 py-1 rounded">
+                                {card.name} {card.isReversed ? "(逆)" : ""}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Frame>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
+      {/* Promo Modal */}
+      <AnimatePresence>
+        {showPromo && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={handleClosePromo}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+            >
+              <div className="w-full max-w-2xl px-6 pointer-events-auto">
+                <Frame className="bg-void-deep border-gold/40 p-8 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50" />
+                  
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="text-gold font-serif text-2xl mb-2">司辰塔罗</h3>
+                      <p className="text-gold-dim text-sm">Tarot of the Hours</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={handleClosePromo}>
+                      <X size={20} className="text-gold/50 hover:text-gold" />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-6 mb-8">
+                    <p className="text-gold/80 leading-relaxed">
+                      如果您喜欢这个项目，欢迎在 GitHub 上为我点亮一颗星。您的支持是我继续完善这个项目的动力。
+                    </p>
+                    
+                    <div className="flex justify-center">
+                      <a
+                        href="https://github.com/luyu14039/tarot-but-hours"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleClosePromo}
+                      >
+                        <Button className="group min-w-[200px]">
+                          <Star size={16} className="mr-2 group-hover:text-yellow-400 transition-colors" />
+                          <span>Star on GitHub</span>
+                        </Button>
+                      </a>
+                    </div>
+
+                    <div className="border-t border-gold/10 pt-6">
+                      <p className="text-gold/60 text-xs uppercase tracking-widest mb-4 text-center">
+                        更多密教模拟器相关项目
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {otherProjects.map((project, index) => (
+                          <a
+                            key={index}
+                            href={project.demo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block group/item"
+                            onClick={handleClosePromo}
+                          >
+                            <div className="h-full p-3 rounded border border-gold/10 bg-gold/5 hover:bg-gold/10 hover:border-gold/30 transition-all">
+                              <h4 className="text-gold text-sm font-serif mb-1 group-hover/item:text-gold-light">
+                                {project.name}
+                              </h4>
+                              <p className="text-[10px] text-gold/40 line-clamp-2">
+                                {project.desc}
+                              </p>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Frame>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* 4. Hour's Quote - Removed from here */}
+      
       {/* Scroll Hint - Fixed at bottom */}
       <AnimatePresence>
         {!hasScrolled && (
@@ -318,7 +569,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 1 }}
-        className="z-20 w-full max-w-5xl px-6 mb-20"
+        className="z-20 w-full max-w-5xl px-6 mb-20 mt-32"
       >
         <div className="flex items-center justify-center gap-4 mb-8 opacity-50">
           <div className="h-[1px] w-12 bg-gold/30" />
@@ -388,6 +639,37 @@ export default function Home() {
           ))}
         </div>
       </motion.div>
+
+      {/* Footer / Disclaimer */}
+      <footer className="z-20 w-full max-w-4xl px-6 pb-12 text-center">
+        <div className="border-t border-gold/10 pt-8 flex flex-col gap-4">
+          <p className="text-[10px] text-gold/30 tracking-widest uppercase">
+            仅供娱乐 · 禁止商业二次开发
+          </p>
+          <p className="text-[10px] text-gold/20 leading-relaxed max-w-2xl mx-auto">
+            本项目为《密教模拟器》(Cultist Simulator) 与《司辰之书》(Book of Hours) 的同人二创作品。
+            <br />
+            所有游戏相关的术语、世界观设定及美术素材的版权与著作权均归属于 Weather Factory 及其开发者 Alexis Kennedy 与 Lottie Bevan 所有。
+            <br />
+            本站仅作为非营利性的粉丝创作，旨在致敬那段隐秘的历史。
+          </p>
+          
+          <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-gold/30">
+            <div className="flex items-center gap-1.5" title="总访问量">
+              <Eye size={12} />
+              <span id="busuanzi_container_site_pv" style={{ display: 'none' }}>
+                <span id="busuanzi_value_site_pv" className="font-mono"></span>
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5" title="总访客数">
+              <Users size={12} />
+              <span id="busuanzi_container_site_uv" style={{ display: 'none' }}>
+                <span id="busuanzi_value_site_uv" className="font-mono"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
