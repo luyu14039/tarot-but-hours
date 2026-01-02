@@ -10,7 +10,7 @@ interface ShareButtonProps {
   filename?: string;
   controls?: React.ReactNode;
   label?: string;
-  variant?: "default" | "ghost" | "outline";
+  variant?: "primary" | "ghost" | "outline";
   size?: "sm" | "md" | "lg" | "icon";
   className?: string;
 }
