@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { Sparkles, Eye, Layers, LayoutGrid, ArrowRight, Settings, X, Github, ExternalLink, Monitor, ChevronDown, History, Clock, Star, Dices, Users } from "lucide-react";
 import { FontDebug } from "@/components/FontDebug";
 import { AspectIcon } from "@/components/AspectIcon";
+import { hoursData as hours } from "@/data/hours";
+import { ShareButton } from "@/components/Share/ShareButton";
+import { HomeShareCard } from "@/components/Share/HomeShareCard";
 
 const quotes = [
   "飞蛾总是飞向光，但光总是烧死飞蛾。",
@@ -98,6 +101,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [localSpread, setLocalSpread] = useState<SpreadType>("single");
   const [quote, setQuote] = useState("");
+  const [randomHour, setRandomHour] = useState(hours[0]);
   const [title, setTitle] = useState(titles[0]);
   const [showSettings, setShowSettings] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -120,6 +124,7 @@ export default function Home() {
 
   useEffect(() => {
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+    setRandomHour(hours[Math.floor(Math.random() * hours.length)]);
     setTitle(titles[Math.floor(Math.random() * titles.length)]);
     setTempKey(apiKey);
 
@@ -202,7 +207,7 @@ export default function Home() {
                 className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20"
               >
                 <Star size={14} className="mr-2" />
-                <span className="tracking-widest text-xs">Star on GitHub</span>
+                <span className="tracking-widest text-xs">GitHub 点星</span>
               </Button>
             </a>
 
@@ -225,7 +230,19 @@ export default function Home() {
               <Settings size={14} className="mr-2" />
               <span className="tracking-widest text-xs">配置仪式密钥 (API Key)</span>
             </Button>
-          </div>
+            <ShareButton
+              variant="ghost"
+              size="sm"
+              className="relative text-gold/40 hover:text-gold hover:bg-gold/5 transition-all duration-300 border border-transparent hover:border-gold/20"
+              label="分享"
+            >
+              <HomeShareCard 
+                quote={quote} 
+                imagePath={randomHour.imagePath} 
+                aspectName={randomHour.name}
+                url={typeof window !== 'undefined' ? window.location.href : undefined}
+              />
+            </ShareButton>          </div>
         </motion.div>
       </header>
 
