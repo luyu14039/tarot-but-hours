@@ -23,7 +23,7 @@ import { ReadingShareCard } from "@/components/Share/ReadingShareCard";
 
 export default function ReadingPage() {
   const router = useRouter();
-  const { question, selectedSpread, drawnCards, reset, apiKey, setApiKey, addToHistory, history, currentReading } = useStore();
+  const { question, questionDescription, selectedSpread, drawnCards, reset, apiKey, setApiKey, addToHistory, history, currentReading } = useStore();
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
   const [readingStarted, setReadingStarted] = useState(false);
@@ -40,6 +40,9 @@ export default function ReadingPage() {
   const [showThinking, setShowThinking] = useState(false);
   const [displayContent, setDisplayContent] = useState("");
   const [showQuestionInShare, setShowQuestionInShare] = useState(false);
+  
+  const [promptOnlyMode, setPromptOnlyMode] = useState(false);
+  const [generatedPrompt, setGeneratedPrompt] = useState("");
 
   const generateReading = async (prompt: string) => {
     setIsLoading(true);
@@ -48,6 +51,7 @@ export default function ReadingPage() {
     setThinkingContent("");
     setDisplayContent("");
     setCompletion("");
+    setPromptOnlyMode(false);
     let fullResponse = "";
 // Prepare Wiki Context
     let wikiContext = "";
@@ -60,6 +64,13 @@ export default function ReadingPage() {
 
     // Append Wiki Context to the user prompt so the API can use it
     const fullPrompt = prompt + "\n\n以下是关于本次抽出的司辰的详细隐秘知识（Wiki资料），请充分利用这些背景故事、传说和细节，使解读更加深邃、准确且富有“密教模拟器”的韵味：\n" + wikiContext;
+
+    if (!apiKey) {
+      setPromptOnlyMode(true);
+      setGeneratedPrompt(fullPrompt);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("https://api.deepseek.com/chat/completions", {
@@ -91,7 +102,6 @@ export default function ReadingPage() {
 *   *漫宿 (The Mansus)*：潜意识、梦境、灵感之源。
 *   *林地 (The Wood)*：混乱的现状、迷茫的开始。
 *   *辉光 (The Glory)*：终极的真理、毁灭性的启示。
-*   *防剿局 (Suppression Bureau)*：现实的阻碍、审查、社会规则。
 *   *伤口 (Wound)*：痛苦、契机、改变的入口。
 *   *饥饿 (Hunger)*：欲望、动力、匮乏。
 
@@ -133,7 +143,7 @@ export default function ReadingPage() {
     *   **强制关联**：解释完牌面后，必须说：“在你的历史中，这意味着……”
     *   **逆位洞察**：如果出现逆位，将其描述为“力量的扭曲”、“影中的倒影”或“未至的时机”。
 3.  **飞升 (The Ascension to the Glory)**：
-    *   **行动建议**：给出**切实可行**的现实建议，但必须用密教的语言进行包装。不要让用户真的去画法阵或献祭，而是将现实行动转化为隐喻。
+    *   **行动建议**：给出**切实可行**的现实建议，但必须用密教的语言进行包装。将现实行动转化为隐喻。
         *   *错误示例*：“在午夜点燃蜡烛。”（太像神棍）
         *   *正确示例*：“你需要进行一次<Icon name="forge"/>的锻造：主动切断那段不再滋养你的关系，就像铁匠敲掉多余的炉渣。这会很痛，但这是重塑形态的代价。”
     *   **结语**：用一句经典的密教风格结束语，如“漫宿没有墙壁”、“辉光在更高处等待”。
@@ -198,6 +208,7 @@ export default function ReadingPage() {
           id: Date.now().toString(),
           timestamp: Date.now(),
           question,
+          questionDescription,
           spread: selectedSpread,
           cards: drawnCards,
           answer: fullResponse
@@ -248,6 +259,7 @@ export default function ReadingPage() {
 
       const prompt = `
 用户问题：${question}
+${questionDescription ? `问题补充描述：${questionDescription}\n` : ''}
 所选牌阵：${spreadName} (${spreadDesc})
 
 【牌面启示】
@@ -267,7 +279,7 @@ ${drawnCards.map((c, i) => `
       `;
       generateReading(prompt);
     }
-  }, [flippedIndices, drawnCards, readingStarted, question, selectedSpread, apiKey, currentReading]);
+  }, [flippedIndices, drawnCards, readingStarted, question, questionDescription, selectedSpread, apiKey, currentReading]);
 
   const allFlipped = drawnCards.length > 0 && flippedIndices.length === drawnCards.length;
 
@@ -576,6 +588,35 @@ ${drawnCards.map((c, i) => `
                   <Sparkles className="text-gold" size={20} strokeWidth={1} />
                 </div>
                 
+                {promptOnlyMode && (
+                  <div className="flex flex-col gap-6">
+                    <div className="bg-gold/5 border border-gold/20 rounded p-6 text-center">
+                      <AlertCircle className="w-8 h-8 text-gold mx-auto mb-3" />
+                      <h4 className="text-gold font-serif text-lg mb-2">手动仪式模式</h4>
+                      <p className="text-gold/70 text-sm leading-relaxed mb-4">
+                        由于未提供 API Key，守密人无法直接降临。
+                        <br />
+                        请复制下方的咒文（Prompt），自行寻找 DeepSeek 或其他 LLM 进行解读。
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(generatedPrompt);
+                          alert("咒文已复制到剪贴板");
+                        }}
+                        className="mx-auto"
+                      >
+                        复制咒文
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-black/30 border border-gold/10 rounded p-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+                      <pre className="text-xs text-gold/50 whitespace-pre-wrap font-mono text-left">
+                        {generatedPrompt}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+
                 {isLoading && !displayContent && !thinkingContent && (
                   <div className="flex flex-col items-center justify-center py-12 gap-4 text-gold/50 animate-pulse">
                     <div className="w-12 h-12 border border-gold/30 rounded-full flex items-center justify-center animate-spin-slow">

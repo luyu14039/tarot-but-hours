@@ -36,7 +36,7 @@ const spreads: { id: SpreadType; name: string; desc: string; icon: any }[] = [
 
 export default function SpreadPage() {
   const router = useRouter();
-  const { question, selectedSpread, setSelectedSpread, setDrawnCards } = useStore();
+  const { question, questionDescription, setQuestionDescription, selectedSpread, setSelectedSpread, setDrawnCards } = useStore();
   const [isShuffling, setIsShuffling] = useState(false);
   const [cardsReady, setCardsReady] = useState(false);
 
@@ -108,7 +108,16 @@ export default function SpreadPage() {
       >
         <Frame className="text-center py-6 px-8">
           <p className="text-muted-text text-xs uppercase tracking-widest mb-2">你的疑问</p>
-          <h2 className="text-xl md:text-2xl font-serif text-gold italic">“{question}”</h2>
+          <h2 className="text-xl md:text-2xl font-serif text-gold italic mb-6">“{question}”</h2>
+          
+          <div className="relative w-full max-w-lg mx-auto">
+            <textarea
+              value={questionDescription}
+              onChange={(e) => setQuestionDescription(e.target.value)}
+              placeholder="（可选）在此补充更多细节，让守密人更精准地洞察你的困境..."
+              className="w-full bg-black/30 border border-gold/20 rounded p-4 text-gold placeholder-gold/20 focus:outline-none focus:border-gold/50 transition-colors font-serif text-sm min-h-[100px] resize-none"
+            />
+          </div>
         </Frame>
       </motion.div>
 

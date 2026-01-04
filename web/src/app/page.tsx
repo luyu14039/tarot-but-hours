@@ -14,9 +14,10 @@ import { AspectIcon } from "@/components/AspectIcon";
 import { hoursData as hours } from "@/data/hours";
 import { ShareButton } from "@/components/Share/ShareButton";
 import { HomeShareCard } from "@/components/Share/HomeShareCard";
+import { ApiKeyModal } from "@/components/ApiKeyModal";
 
 const quotes = [
-  "飞蛾总是飞向光，但光总是烧死飞蛾。",
+  "辉光是一个疑问，而飞蛾总以肯定作答。",
   "有些知识一旦入眼，便无法被遗忘。",
   "伤口是世界的裂隙。",
   "历史有许多重，而我们只记得其中一重。",
@@ -164,6 +165,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen flex flex-col items-center py-20 overflow-x-hidden bg-void text-primary-text selection:bg-gold selection:text-void font-serif">
+      <ApiKeyModal />
       <FontDebug />
       <Particles />
       

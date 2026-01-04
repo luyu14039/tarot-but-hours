@@ -14,6 +14,7 @@ export interface HistoryItem {
   id: string;
   timestamp: number;
   question: string;
+  questionDescription?: string;
   spread: SpreadType;
   cards: DrawnCard[];
   answer: string;
@@ -25,6 +26,9 @@ interface AppState {
 
   question: string;
   setQuestion: (q: string) => void;
+
+  questionDescription: string;
+  setQuestionDescription: (d: string) => void;
   
   selectedSpread: SpreadType;
   setSelectedSpread: (s: SpreadType) => void;
@@ -56,6 +60,9 @@ export const useStore = create<AppState>()(
 
       question: '',
       setQuestion: (q) => set({ question: q }),
+
+      questionDescription: '',
+      setQuestionDescription: (d) => set({ questionDescription: d }),
       
       selectedSpread: 'single',
       setSelectedSpread: (s) => set({ selectedSpread: s }),
@@ -71,6 +78,7 @@ export const useStore = create<AppState>()(
       clearHistory: () => set({ history: [] }),
       loadHistoryItem: (item) => set({
         question: item.question,
+        questionDescription: item.questionDescription || '',
         selectedSpread: item.spread,
         drawnCards: item.cards,
         currentReading: item.answer
@@ -81,7 +89,7 @@ export const useStore = create<AppState>()(
       hasSeenPromo: false,
       markPromoSeen: () => set({ hasSeenPromo: true }),
       
-      reset: () => set({ question: '', selectedSpread: 'single', drawnCards: [], currentReading: null }),
+      reset: () => set({ question: '', questionDescription: '', selectedSpread: 'single', drawnCards: [], currentReading: null }),
     }),
     {
       name: 'tarot-storage',
